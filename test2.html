@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mortgage Calculator</title>
+    <script>
+        var housePrice, deposit, mortgageRate, doc;
+
+        function initializeValues() {
+            housePrice = parseFloat(document.getElementById("housePrice").value);
+            deposit = parseFloat(document.getElementById("deposit").value);
+            mortgageRate = parseFloat(document.getElementById("mortgageRate").value);
+            doc = (((housePrice - deposit)) * (mortgageRate/100))/12;
+            document.getElementById("monthlyPayment").value = doc.toFixed(2);
+        }
+
+        function calculateMortgage() {
+            initializeValues();
+
+            // Get the monthly payment value from the input field
+            var monthlyPayment = parseFloat(document.getElementById("monthlyPayment").value);
+
+            // Calculate the difference between house price and deposit
+            var difference = housePrice - deposit;
+
+            // Calculate yearly payment
+            var yearlyPayment = monthlyPayment * 12;
+
+            // Display the loan amount and yearly payment
+            document.getElementById("output").innerHTML = "Loan: " + difference;
+            document.getElementById("output1").innerHTML = "Yearly payment: " + yearlyPayment;
+
+            var debt = difference;
+            var overpayment = 0;
+            var years = 0;
+
+            var result = "";
+
+            // Define a function for each cycle calculation
+            function calculateCycle() {
+                // Calculate overpayment and remaining debt for each cycle
+                debt = debt - yearlyPayment;
+                var interest = debt * (mortgageRate / 100);
+                overpayment += interest;
+                debt = debt + interest;
+                years++;
+
+                // Append the result for each cycle to the output string
+                result += "Year: " + years + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + debt.toFixed(2) + "<br>";
+
+                // Display the results in the output element
+                document.getElementById("output2").innerHTML = result;
+
+                if (debt <= yearlyPayment) {
+                    // Last year calculation
+                    setTimeout(function() {
+                        result2 = result + "Last Year: " + (years + 1) + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + 0 + "<br>";
+                        document.getElementById("output2").innerHTML = result2;
+                    }, 1000);
+                }
+
+                // Check if debt is still remaining, then initiate the next cycle after a 1-second delay
+                if (debt >= yearlyPayment) {
+                    setTimeout(calculateCycle, 1000);
+                }
+            }
+
+            // Initiate the first cycle
+            calculateCycle();
+        }
+
+        function handleInputChange() {
+            calculateMortgage();
+        }
+    </script>
+</head>
+<body>
+    <h1>Mortgage Calculator</h1>
+    <h1>House's Bricks</h1>
+
+    <p>Shows your debt over years</p>
+
+    <label for="housePrice">House's price:</label>
+    <input type="number" id="housePrice" name="HousesPrice" placeholder="Enter House's price" step="5000" value="50000" onchange="handleInputChange()"><br><br>
+
+    <label for="deposit">Deposit:</label>
+    <input type="number" id="deposit" name="deposit" placeholder="Enter deposit amount" step="1000" value="10000" onchange="handleInputChange()"><br><br>
+
+    <label for="mortgageRate">Mortgage rate:</label>
+    <input type="number" id="mortgageRate" name="mortgageRate" placeholder="Enter mortgage rate" step="0.1" value="5" onchange="handleInputChange()"><br><br>
+
+    <label for="monthlyPayment">Monthly payment:</label>
+    <input type="number" id="monthlyPayment" name="monthlyPayment" placeholder="Enter monthly payment amount" step="50" value="0" onchange="handleInputChange()"><br><br>
+
+    <button onclick="calculateMortgage()">Calculate Mortgage</button>
+
+    <p id="output"></p>
+    <p id="output1"></p>
+    <p id="output2"></p>
+
+    <script>
+        initializeValues();
+    </script>
+</body>
+</html>

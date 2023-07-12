@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mortgage Calculator</title>
+    <script>
+        function calculateDifference() {
+            // Get the house price and deposit values from the input fields
+            var housePrice = document.getElementById("housePrice").value;
+            var deposit = document.getElementById("deposit").value;
+
+            var mortgageRate = document.getElementById("mortgageRate").value;
+
+            var monthlyPayment = document.getElementById("monthlyPayment").value;
+
+            // Calculate the difference between house price and deposit
+            var difference = housePrice - deposit;
+
+            var yearlyPayment = monthlyPayment * 12
+
+
+
+
+
+            // Display the result in the output element
+            document.getElementById("output").textContent = "Loan: " + difference;
+
+
+            document.getElementById("output1").textContent = "Yearly payment: " + yearlyPayment;
+        }
+    </script>
+</head>
+<body>
+    <h1>Mortgage Calculator</h1>
+    <h1>House's Bricks</h1>
+
+    <p>Shows your debt over years</p>
+
+    <label for="housePrice">House's price:</label>
+    <input type="number" id="housePrice" name="HousesPrice" placeholder="Enter House's price" step="5000" value="50000"><br><br>
+
+    <label for="deposit">Deposit:</label>
+    <input type="number" id="deposit" name="deposit" placeholder="Enter deposit amount" step="1000" value="10000"><br><br>
+
+    <label for="mortgageRate">Mortgage rate:</label>
+    <input type="number" id="mortgageRate" name="mortgageRate" placeholder="Enter mortgage rate" step="0.1" value="5"><br><br>
+
+    <label for="monthlyPayment">Monthly payment:</label>
+    <input type="number" id="monthlyPayment" name="monthlyPayment" placeholder="Enter monthly payment amount" step="50" value="500"><br><br>
+
+    <button onclick="calculateDifference()">Calculate</button>
+
+    <p id="output"></p>
+    <p id="output1"></p>
+    <section id="debt_list">
+        <ol>
+            debt_left.map((element, index) => <li>index, element</li>)
+        </ol>
+    </section>
+</body>
+</html>
+
