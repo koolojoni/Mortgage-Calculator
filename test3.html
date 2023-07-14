@@ -5,11 +5,27 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background-color: #337ab7;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 20px;
+            padding-bottom: 30px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         h1 {
-            color: #333;
+            color: #337ab7;
             text-align: center;
         }
 
@@ -53,6 +69,18 @@
             border: 1px solid #ccc;
             padding: 10px;
         }
+
+        .year {
+            margin-top: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        .total {
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
     <script>
         window.onload = function() {
@@ -64,7 +92,7 @@
 
         function antiSMALL() {
             var monthlyPayment = parseFloat(document.getElementById("monthlyPayment").value);
-            var doc = (((housePrice - deposit)) * (mortgageRate/100))/12;
+            var doc = (((housePrice - deposit)) * (mortgageRate / 100)) / 12;
             if (monthlyPayment < doc) {
                 calculatMP();
             }
@@ -72,8 +100,8 @@
 
         function stopCalculation() {
             stopCalculationFlag = true; // Устанавливаем флаг в true для остановки расчета
-            
-            document.getElementById("calculateButton").disabled = false;  // Включаем кнопку "Calculate Mortgage"
+
+            document.getElementById("calculateButton").disabled = false; // Включаем кнопку "Calculate Mortgage"
         }
 
         function initializeValues() {
@@ -81,17 +109,17 @@
             deposit = parseFloat(document.getElementById("deposit").value);
             mortgageRate = parseFloat(document.getElementById("mortgageRate").value);
         }
+
         function calculatMP2() {
             initializeValues();
-            doc = (((housePrice - deposit)) * (mortgageRate/100))/12;
-            document.getElementById("monthlyPayment").placeholder ="Minimum: " +  Math.ceil(doc);
+            doc = (((housePrice - deposit)) * (mortgageRate / 100)) / 12;
+            document.getElementById("monthlyPayment").placeholder = "Minimum: " + Math.ceil(doc);
             document.getElementById("monthlyPayment").min = Math.ceil(doc);
         }
 
-
         function calculatMP() {
             initializeValues();
-            doc = (((housePrice - deposit)) * (mortgageRate/100))/12;
+            doc = (((housePrice - deposit)) * (mortgageRate / 100)) / 12;
             document.getElementById("monthlyPayment").value = Math.ceil(doc);
             document.getElementById("monthlyPayment").min = Math.ceil(doc);
         }
@@ -126,7 +154,7 @@
 
             // Определяем функцию для расчета каждого цикла
             function calculateCycle() {
-                
+
                 if (stopCalculationFlag) {
                     return;
                 }
@@ -139,7 +167,7 @@
                 years++;
 
                 // Добавляем результат каждого цикла к строке вывода
-                result += "Year: " + years + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + debt.toFixed(2) + "<br>";
+                result += "<div class='year'>Year: " + years + "<br>Overpayment: " + overpayment.toFixed(2) + "<br>Remaining Debt: " + debt.toFixed(2) + "</div>";
 
                 // Отображаем результаты в элементе вывода
                 document.getElementById("output2").innerHTML = result;
@@ -147,17 +175,19 @@
                 if (debt <= yearlyPayment) {
                     // Расчет последнего года
                     setTimeout(function() {
-                        var mounth = debt/monthlyPayment;
+                        var mounth = debt / monthlyPayment;
                         mounth = Math.round(mounth);
-                        result2 = result + " Month: "+  mounth + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + 0 + "<br>";
+                        result2 = result + "<div class='year'>Month: " + mounth + "<br>Overpayment: " + overpayment.toFixed(2) + "<br>Remaining Debt: " + 0 + "</div>";
                         document.getElementById("output2").innerHTML = result2;
                         stopCalculationFlag = true
                         button.disabled = false;
+
+                        showTotal(difference, overpayment, years, mounth);
                     }, 250);
                 }
 
                 // Проверяем, остался ли долг, затем запускаем следующий цикл через задержку в 1 секунду
-                if (debt >= yearlyPayment-monthlyPayment) {
+                if (debt >= yearlyPayment - monthlyPayment) {
                     setTimeout(calculateCycle, 250);
                 }
             }
@@ -165,35 +195,51 @@
             // Запускаем первый цикл
             calculateCycle();
         }
-        
+
         function handleInputChange() {
             // Рассчитываем ипотеку при каждом изменении ввода
             calculatMP2();
         }
+
+        function showTotal(debt, overpayment , years, mounth) {
+            var total = debt + overpayment;
+            var totalInfo =
+                "<div class='total'>Sum total</div><div class='year'>Total Years: " +
+                years +
+                 "<br>Total Mounth: " + mounth +
+                "<br>Total Overpayment: " +
+                overpayment.toFixed(2) +
+                "<br>Total Payment: " +
+                total.toFixed(2) +
+                "</div>";
+            document.getElementById("output2").insertAdjacentHTML('beforeend', totalInfo);
+        }
     </script>
 </head>
 <body>
-    <h1>Mortgage Calculator</h1>
+    <div class="container">
+        <h1>Mortgage Calculator</h1>
 
-    <p>Shows your debt over years</p>
+        <p>Shows your debt over years</p>
 
-    <label for="housePrice">House Price:</label>
-    <input type="number" id="housePrice" name="HousesPrice" placeholder="Enter House Price" step="5000" value="50000" onchange="handleInputChange()" min="0"><br><br>
+        <label for="housePrice">House Price:</label>
+        <input type="number" id="housePrice" name="HousesPrice" placeholder="Enter House Price" step="5000" value="50000" onchange="handleInputChange()" min="0"><br><br>
 
-    <label for="deposit">Deposit:</label>
-    <input type="number" id="deposit" name="deposit" placeholder="Enter deposit amount" step="1000" value="10000" onchange="handleInputChange()" min="0"><br><br>
+        <label for="deposit">Deposit:</label>
+        <input type="number" id="deposit" name="deposit" placeholder="Enter deposit amount" step="1000" value="10000" onchange="handleInputChange()" min="0"><br><br>
 
-    <label for="mortgageRate">Mortgage Rate:</label>
-    <input type="number" id="mortgageRate" name="mortgageRate" placeholder="Enter mortgage rate" step="0.1" value="5" onchange="handleInputChange()" min="0"><br><br>
+        <label for="mortgageRate">Mortgage Rate:</label>
+        <input type="number" id="mortgageRate" name="mortgageRate" placeholder="Enter mortgage rate" step="0.1" value="5" onchange="handleInputChange()" min="0"><br><br>
 
-    <label for="monthlyPayment">Monthly Payment:</label>
-    <input type="number" id="monthlyPayment" name="monthlyPayment" placeholder="Enter monthly payment amount" step="50" value= "" onchange="antiSMALL()" ><br><br>
+        <label for="monthlyPayment">Monthly Payment:</label>
+        <input type="number" id="monthlyPayment" name="monthlyPayment" placeholder="Enter monthly payment amount" step="50" value="" onchange="antiSMALL()"><br><br>
 
-    <button id="calculateButton" onclick="calculateMortgage()">Calculate Mortgage</button>
-    <button id="stopCalculationButton" onclick="stopCalculation()">Stop Calculation</button>
+        <button id="calculateButton" onclick="calculateMortgage()">Calculate Mortgage</button>
+        <button id="stopCalculationButton" onclick="stopCalculation()">Stop Calculation</button>
 
-    <p id="output"></p>
-    <p id="output1"></p>
-    <p id="output2"></p>
+        <p id="output"></p>
+        <p id="output1"></p>
+        <div id="output2"></div>
+    </div>
 </body>
 </html>

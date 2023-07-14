@@ -3,29 +3,59 @@
 <head>
     <title>Mortgage Calculator</title>
     <script>
+        window.onload = function() {
+            calculatMP();
+        };
+
         var housePrice, deposit, mortgageRate, doc;
+        var stopCalculationFlag = false; // Флаг для указания остановки расчета
+
+        function antiSMALL() {
+            var monthlyPayment = parseFloat(document.getElementById("monthlyPayment").value);
+            var doc = (((housePrice - deposit)) * (mortgageRate/100))/12;
+            if (monthlyPayment < doc) {
+                calculatMP();
+            }
+        }
+
+        function stopCalculation() {
+            stopCalculationFlag = true; // Устанавливаем флаг в true для остановки расчета
+            
+            document.getElementById("calculateButton").disabled = false;  // Включаем кнопку "Calculate Mortgage"
+        }
 
         function initializeValues() {
             housePrice = parseFloat(document.getElementById("housePrice").value);
             deposit = parseFloat(document.getElementById("deposit").value);
             mortgageRate = parseFloat(document.getElementById("mortgageRate").value);
+        }
+        
+        function calculatMP() {
+            initializeValues();
             doc = (((housePrice - deposit)) * (mortgageRate/100))/12;
-            document.getElementById("monthlyPayment").value = doc.toFixed(2);
+            document.getElementById("monthlyPayment").value = Math.ceil(doc);
+            document.getElementById("monthlyPayment").min = Math.ceil(doc);
         }
 
         function calculateMortgage() {
+            document.getElementById("output2").innerHTML = "";
+            document.getElementById("output").innerHTML = "";
+            document.getElementById("output1").innerHTML = "";
+            var button = document.getElementById("calculateButton");
+            button.disabled = true;
+            stopCalculationFlag = false;
             initializeValues();
 
-            // Get the monthly payment value from the input field
+            // Получаем значение ежемесячного платежа из поля ввода
             var monthlyPayment = parseFloat(document.getElementById("monthlyPayment").value);
 
-            // Calculate the difference between house price and deposit
+            // Вычисляем разницу между стоимостью дома и первоначальным взносом
             var difference = housePrice - deposit;
 
-            // Calculate yearly payment
+            // Вычисляем годовой платеж
             var yearlyPayment = monthlyPayment * 12;
 
-            // Display the loan amount and yearly payment
+            // Выводим сумму займа и годовой платеж
             document.getElementById("output").innerHTML = "Loan: " + difference;
             document.getElementById("output1").innerHTML = "Yearly payment: " + yearlyPayment;
 
@@ -35,70 +65,75 @@
 
             var result = "";
 
-            // Define a function for each cycle calculation
+            // Определяем функцию для расчета каждого цикла
             function calculateCycle() {
-                // Calculate overpayment and remaining debt for each cycle
+                
+                if (stopCalculationFlag) {
+                    return;
+                }
+
+                // Вычисляем переплату и оставшийся долг для каждого цикла
                 debt = debt - yearlyPayment;
                 var interest = debt * (mortgageRate / 100);
                 overpayment += interest;
                 debt = debt + interest;
                 years++;
 
-                // Append the result for each cycle to the output string
+                // Добавляем результат каждого цикла к строке вывода
                 result += "Year: " + years + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + debt.toFixed(2) + "<br>";
 
-                // Display the results in the output element
+                // Отображаем результаты в элементе вывода
                 document.getElementById("output2").innerHTML = result;
 
                 if (debt <= yearlyPayment) {
-                    // Last year calculation
+                    // Расчет последнего года
                     setTimeout(function() {
-                        result2 = result + "Last Year: " + (years + 1) + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + 0 + "<br>";
+                        var mounth = debt/monthlyPayment;
+                        mounth = Math.round(mounth);
+                        result2 = result + "Last Year: " + (years + 1) + " Month: "+  mounth + ", Overpayment: " + overpayment.toFixed(2) + ", Remaining Debt: " + 0 + "<br>";
                         document.getElementById("output2").innerHTML = result2;
-                    }, 1000);
+                        button.disabled = false;
+                    }, 250);
                 }
 
-                // Check if debt is still remaining, then initiate the next cycle after a 1-second delay
-                if (debt >= yearlyPayment) {
-                    setTimeout(calculateCycle, 1000);
+                // Проверяем, остался ли долг, затем запускаем следующий цикл через задержку в 1 секунду
+                if (debt >= yearlyPayment-monthlyPayment) {
+                    setTimeout(calculateCycle, 250);
                 }
             }
 
-            // Initiate the first cycle
+            // Запускаем первый цикл
             calculateCycle();
         }
-
+        
         function handleInputChange() {
-            calculateMortgage();
+            // Рассчитываем ипотеку при каждом изменении ввода
+            calculatMP();
         }
     </script>
 </head>
 <body>
     <h1>Mortgage Calculator</h1>
-    <h1>House's Bricks</h1>
 
     <p>Shows your debt over years</p>
 
-    <label for="housePrice">House's price:</label>
-    <input type="number" id="housePrice" name="HousesPrice" placeholder="Enter House's price" step="5000" value="50000" onchange="handleInputChange()"><br><br>
+    <label for="housePrice">House Price:</label>
+    <input type="number" id="housePrice" name="HousesPrice" placeholder="Enter House Price" step="5000" value="50000" onchange="handleInputChange()" min="0"><br><br>
 
     <label for="deposit">Deposit:</label>
-    <input type="number" id="deposit" name="deposit" placeholder="Enter deposit amount" step="1000" value="10000" onchange="handleInputChange()"><br><br>
+    <input type="number" id="deposit" name="deposit" placeholder="Enter deposit amount" step="1000" value="10000" onchange="handleInputChange()" min="0"><br><br>
 
-    <label for="mortgageRate">Mortgage rate:</label>
-    <input type="number" id="mortgageRate" name="mortgageRate" placeholder="Enter mortgage rate" step="0.1" value="5" onchange="handleInputChange()"><br><br>
+    <label for="mortgageRate">Mortgage Rate:</label>
+    <input type="number" id="mortgageRate" name="mortgageRate" placeholder="Enter mortgage rate" step="0.1" value="5" onchange="handleInputChange()" min="0"><br><br>
 
-    <label for="monthlyPayment">Monthly payment:</label>
-    <input type="number" id="monthlyPayment" name="monthlyPayment" placeholder="Enter monthly payment amount" step="50" value="0" onchange="handleInputChange()"><br><br>
+    <label for="monthlyPayment">Monthly Payment:</label>
+    <input type="number" id="monthlyPayment" name="monthlyPayment" placeholder="Enter monthly payment amount" step="50" value= "50" onchange="antiSMALL()" ><br><br>
 
-    <button onclick="calculateMortgage()">Calculate Mortgage</button>
+    <button id="calculateButton" onclick="calculateMortgage()">Calculate Mortgage</button>
+    <button id="stopCalculationButton" onclick="stopCalculation()">Stop Calculation</button>
 
     <p id="output"></p>
     <p id="output1"></p>
     <p id="output2"></p>
-
-    <script>
-        initializeValues();
-    </script>
 </body>
 </html>
